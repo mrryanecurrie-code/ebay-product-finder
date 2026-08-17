@@ -1,0 +1,2 @@
+import test from "node:test";import assert from "node:assert/strict";import {requiredBuyEvidence} from "../src/domain/confidence.js";
+test("BUY is blocked without verified eBay demand",()=>{const g=requiredBuyEvidence([{name:"supplier_cost",level:"VERIFIED",source:"supplier"},{name:"product_identity",level:"VERIFIED",source:"UPC"},{name:"ebay_price",level:"VERIFIED",source:"Browse"},{name:"ebay_demand",level:"UNKNOWN",source:"none"},{name:"shipping_cost",level:"VERIFIED",source:"quote"}]);assert.equal(g.eligible,false);assert.deepEqual(g.missing,["ebay_demand"]);});
