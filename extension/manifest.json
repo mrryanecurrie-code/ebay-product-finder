@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Product Finder Companion",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Investigate products from shopping, wholesale, and eBay Product Research pages.",
   "permissions": ["activeTab", "scripting", "storage", "tabs"],
   "optional_host_permissions": ["https://*/*", "http://*/*"],
@@ -10,6 +10,6 @@
   "options_page": "options.html",
   "content_scripts": [
     { "matches": ["https://*/*", "http://*/*"], "js": ["content.js"], "run_at": "document_idle" },
-    { "matches": ["https://*.ebay.com/*", "https://*.ebay.ca/*"], "js": ["ebay-product-research.js"], "run_at": "document_idle" }
+    { "matches": ["https://*.ebay.com/*", "https://*.ebay.ca/*"], "js": ["ebay-product-research.js", "ebay-controller.js"], "run_at": "document_idle" }
   ]
 }
