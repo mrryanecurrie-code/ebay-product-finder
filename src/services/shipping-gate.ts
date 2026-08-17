@@ -1,0 +1,3 @@
+export type ShippingQuote={supplier:string;destination:string;currency:string;total:number;itemCount:number;source:"SUPPLIER_CHECKOUT"|"SUPPLIER_QUOTE"|"MANUAL_VERIFIED";verifiedAt:string};
+export function allocateShipping(quote:ShippingQuote,items:{id:string;qty:number}[]){const units=items.reduce((s,i)=>s+i.qty,0);if(units<=0)throw new Error("Cannot allocate shipping to zero units");const perUnit=quote.total/units;return items.map(i=>({productId:i.id,qty:i.qty,shippingPerUnit:perUnit,currency:quote.currency,evidence:quote.source,verifiedAt:quote.verifiedAt}));}
+export function shippingGate(quote?:ShippingQuote){return quote?{verified:true,reason:"Supplier shipping cost verified"}:{verified:false,reason:"Verify supplier shipping to destination before final BUY"};}
