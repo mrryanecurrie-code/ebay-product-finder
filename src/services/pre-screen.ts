@@ -1,0 +1,4 @@
+import {SupplierProduct} from "./supplier-research.js";
+export type PreScreen={eligible:boolean;reasons:string[]};
+export function preScreen(p:SupplierProduct):PreScreen{const reasons:string[]=[];if(!p.title.trim())reasons.push("Missing product title");if(!(p.unitCost>0))reasons.push("Missing/invalid supplier cost");if(!p.currency||p.currency.length!==3)reasons.push("Missing/invalid supplier currency");if((p.packSize??1)<1)reasons.push("Invalid pack size");return {eligible:reasons.length===0,reasons};}
+export function splitPreScreen(products:SupplierProduct[]){const eligible:SupplierProduct[]=[];const rejected:{product:SupplierProduct;reasons:string[]}[]=[];for(const p of products){const r=preScreen(p);r.eligible?eligible.push(p):rejected.push({product:p,reasons:r.reasons})}return {eligible,rejected};}
