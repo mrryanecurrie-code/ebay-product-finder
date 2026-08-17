@@ -1,0 +1,3 @@
+import test from "node:test";import assert from "node:assert/strict";import {dedupeProducts} from "../src/services/product-dedupe.js";
+test("same UPC and pack keeps cheapest supplier offer",()=>{const rows:any[]=[{id:"a",title:"ANUA X",upc:"123",unitCost:10,currency:"USD",supplier:"A",packSize:1},{id:"b",title:"ANUA X",upc:"123",unitCost:8,currency:"USD",supplier:"B",packSize:1}];const d=dedupeProducts(rows);assert.equal(d.length,1);assert.equal(d[0].unitCost,8)});
+test("single and multipack remain distinct",()=>{const rows:any[]=[{id:"a",title:"X",upc:"123",unitCost:10,currency:"USD",supplier:"A",packSize:1},{id:"b",title:"X 2 pack",upc:"123",unitCost:18,currency:"USD",supplier:"A",packSize:2}];assert.equal(dedupeProducts(rows).length,2)});
