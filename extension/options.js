@@ -1,0 +1,1 @@
+async function load(){const c=await chrome.storage.local.get({apiBase:'http://localhost:3000',authToken:''});apiBase.value=c.apiBase;authToken.value=c.authToken}save.onclick=async()=>{await chrome.storage.local.set({apiBase:apiBase.value.replace(/\/$/,''),authToken:authToken.value});status.textContent=' Saved.'};load();
