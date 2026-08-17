@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Product Finder Companion",
+  "version": "0.1.0",
+  "description": "Investigate products from any shopping or wholesale page and send them to Product Finder.",
+  "permissions": ["activeTab", "scripting", "storage", "tabs"],
+  "optional_host_permissions": ["https://*/*", "http://*/*"],
+  "background": { "service_worker": "service-worker.js" },
+  "action": { "default_popup": "popup.html", "default_title": "Product Finder" },
+  "content_scripts": [{ "matches": ["https://*/*", "http://*/*"], "js": ["content.js"], "run_at": "document_idle" }]
+}
