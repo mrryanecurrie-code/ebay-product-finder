@@ -1,0 +1,3 @@
+export type FxRates=Record<string,number>;
+export function convertCurrency(amount:number,from:string,to="USD",rates:FxRates={}){const f=from.toUpperCase(),t=to.toUpperCase();if(f===t)return {amount,currency:t,rate:1};const key=`${f}_${t}`;const rate=rates[key];if(!rate||rate<=0)throw new Error(`Missing FX rate ${key}; currency conversion must never be assumed`);return {amount:amount*rate,currency:t,rate};}
+export function assertCurrency(currency:string,expected="USD"){if(currency.toUpperCase()!==expected.toUpperCase())throw new Error(`Expected ${expected}, received ${currency}. Convert explicitly before economics.`);}
