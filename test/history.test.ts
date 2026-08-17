@@ -1,0 +1,4 @@
+import test from "node:test";import assert from "node:assert/strict";import {analyzeSoldHistory} from "../src/domain/history.js";
+const asOf=new Date("2026-08-16T12:00:00Z");
+test("does not treat 24 January sales as 2 sales every month",()=>{const events=Array.from({length:24},(_,i)=>({soldAt:`2026-01-${String((i%20)+1).padStart(2,"0")}T12:00:00Z`,quantity:1,price:20,currency:"USD",seller:"A"}));const h=analyzeSoldHistory(events,asOf);assert.equal(h.continuity,"ONE_OFF");assert.equal(h.activeMonths,1);assert.equal(h.windows.find(w=>w.days===30)?.unitsSold,0);});
+test("recognizes year-round demand",()=>{const events=Array.from({length:12},(_,i)=>{const d=new Date(Date.UTC(2025,8+i,15));return {soldAt:d.toISOString(),quantity:2,price:20,currency:"USD",seller:"A"}});const h=analyzeSoldHistory(events,asOf);assert.equal(h.continuity,"CONTINUOUS");assert.ok(h.activeMonths>=8);});
