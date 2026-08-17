@@ -1,0 +1,4 @@
+export type CacheEntry<T>={value:T;expiresAt:number;createdAt:number};
+export class ResearchCache{private data=new Map<string,CacheEntry<unknown>>();get<T>(key:string){const e=this.data.get(key) as CacheEntry<T>|undefined;if(!e)return undefined;if(e.expiresAt<Date.now()){this.data.delete(key);return undefined}return e.value}set<T>(key:string,value:T,ttlMs:number){this.data.set(key,{value,createdAt:Date.now(),expiresAt:Date.now()+ttlMs})}clear(){this.data.clear()}}
+export class CallBudget{private used=0;constructor(public readonly maxCalls:number){}consume(count=1){if(this.used+count>this.maxCalls)throw new Error(`Research call budget exhausted (${this.used}/${this.maxCalls}); resume later instead of hammering provider`);this.used+=count;return this.remaining()}remaining(){return this.maxCalls-this.used}usage(){return {used:this.used,max:this.maxCalls,remaining:this.remaining()}}}
+export const researchCache=new ResearchCache();
