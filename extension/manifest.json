@@ -1,12 +1,13 @@
 {
   "manifest_version": 3,
   "name": "Product Finder Companion",
-  "version": "0.2.1",
-  "description": "Investigate products from shopping, wholesale, and eBay Product Research pages.",
-  "permissions": ["activeTab", "scripting", "storage", "tabs"],
+  "version": "0.3.0",
+  "description": "Persistent sourcing companion for shopping, wholesale, and eBay Product Research pages.",
+  "permissions": ["activeTab", "scripting", "storage", "tabs", "sidePanel"],
   "optional_host_permissions": ["https://*/*", "http://*/*"],
   "background": { "service_worker": "service-worker.js" },
-  "action": { "default_popup": "popup.html", "default_title": "Product Finder" },
+  "action": { "default_title": "Product Finder" },
+  "side_panel": { "default_path": "popup.html" },
   "options_page": "options.html",
   "content_scripts": [
     { "matches": ["https://*/*", "http://*/*"], "js": ["content.js"], "run_at": "document_idle" },
