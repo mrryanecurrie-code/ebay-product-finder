@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Product Finder Companion",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Persistent sourcing companion for shopping, wholesale, and eBay Product Research pages.",
   "permissions": ["activeTab", "scripting", "storage", "tabs", "sidePanel"],
   "optional_host_permissions": ["https://*/*", "http://*/*"],
