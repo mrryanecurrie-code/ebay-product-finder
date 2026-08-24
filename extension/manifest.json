@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Product Finder Companion",
-  "version": "0.5.0",
-  "description": "Persistent eBay sourcing companion with automatic product detection and Product Research.",
+  "version": "0.6.0",
+  "description": "Persistent eBay sourcing companion with automatic product research, landed-cost economics, and wholesale list analysis.",
   "permissions": ["activeTab", "scripting", "storage", "tabs", "sidePanel"],
   "host_permissions": [
     "https://*.ebay.com/*",
