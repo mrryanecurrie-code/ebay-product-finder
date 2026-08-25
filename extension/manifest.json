@@ -1,14 +1,22 @@
 {
   "manifest_version": 3,
   "name": "Product Finder Companion",
-  "version": "0.9.1",
-  "description": "Amazon-to-eBay product scout with Product Research, automatic Sold Items fallback, and worker diagnostics.",
-  "permissions": ["activeTab", "scripting", "storage", "tabs", "sidePanel"],
+  "version": "0.10.0",
+  "description": "Amazon-to-eBay sourcing companion with manual eBay Product Research and Google Sheets export.",
+  "permissions": ["activeTab", "scripting", "storage", "tabs", "sidePanel", "identity"],
   "host_permissions": [
     "https://*.ebay.com/*", "https://ebay.com/*", "https://*.ebay.ca/*", "https://ebay.ca/*",
-    "https://*.amazon.com/*", "https://amazon.com/*", "https://*.amazon.ca/*", "https://amazon.ca/*"
+    "https://*.amazon.com/*", "https://amazon.com/*", "https://*.amazon.ca/*", "https://amazon.ca/*",
+    "https://www.googleapis.com/*"
   ],
   "optional_host_permissions": ["https://*/*", "http://*/*"],
+  "oauth2": {
+    "client_id": "REPLACE_WITH_GOOGLE_OAUTH_CLIENT_ID.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/drive.file",
+      "https://www.googleapis.com/auth/spreadsheets"
+    ]
+  },
   "background": { "service_worker": "service-worker.js" },
   "action": { "default_title": "Product Finder" },
   "side_panel": { "default_path": "popup.html" },
