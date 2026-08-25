@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Product Finder Companion",
-  "version": "0.8.1",
-  "description": "Amazon-to-eBay product scout with a persistent authenticated eBay Product Research worker.",
+  "version": "0.9.0",
+  "description": "Amazon-to-eBay product scout with Product Research and automatic eBay Sold Items fallback.",
   "permissions": ["activeTab", "scripting", "storage", "tabs", "sidePanel"],
   "host_permissions": [
     "https://*.ebay.com/*", "https://ebay.com/*", "https://*.ebay.ca/*", "https://ebay.ca/*",
@@ -15,7 +15,7 @@
   "options_page": "options.html",
   "content_scripts": [
     { "matches": ["https://*.ebay.com/*", "https://ebay.com/*", "https://*.ebay.ca/*", "https://ebay.ca/*"], "js": ["content.js"], "run_at": "document_idle" },
-    { "matches": ["https://*.ebay.com/*", "https://ebay.com/*", "https://*.ebay.ca/*", "https://ebay.ca/*"], "js": ["ebay-product-research.js", "ebay-controller.js"], "run_at": "document_idle" },
+    { "matches": ["https://*.ebay.com/*", "https://ebay.com/*", "https://*.ebay.ca/*", "https://ebay.ca/*"], "js": ["ebay-product-research.js", "ebay-sold-search.js", "ebay-controller.js"], "run_at": "document_idle" },
     { "matches": ["https://*.amazon.com/*", "https://amazon.com/*", "https://*.amazon.ca/*", "https://amazon.ca/*"], "js": ["amazon-capture.js"], "run_at": "document_idle" }
   ]
 }
