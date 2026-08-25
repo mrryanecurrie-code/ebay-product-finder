@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Product Finder Companion",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Automatic Amazon-to-eBay product scout with eBay research, landed-cost economics, and wholesale analysis.",
   "permissions": ["activeTab", "scripting", "storage", "tabs", "sidePanel"],
   "host_permissions": [
@@ -15,6 +15,7 @@
   "options_page": "options.html",
   "content_scripts": [
     { "matches": ["https://*.ebay.com/*", "https://ebay.com/*", "https://*.ebay.ca/*", "https://ebay.ca/*"], "js": ["content.js"], "run_at": "document_idle" },
-    { "matches": ["https://*.ebay.com/*", "https://ebay.com/*", "https://*.ebay.ca/*", "https://ebay.ca/*"], "js": ["ebay-product-research.js", "ebay-controller.js"], "run_at": "document_idle" }
+    { "matches": ["https://*.ebay.com/*", "https://ebay.com/*", "https://*.ebay.ca/*", "https://ebay.ca/*"], "js": ["ebay-product-research.js", "ebay-controller.js"], "run_at": "document_idle" },
+    { "matches": ["https://*.amazon.com/*", "https://amazon.com/*", "https://*.amazon.ca/*", "https://amazon.ca/*"], "js": ["amazon-capture.js"], "run_at": "document_idle" }
   ]
 }
