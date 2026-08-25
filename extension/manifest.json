@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Product Finder Companion",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Amazon-to-eBay product scout with a persistent authenticated eBay Product Research worker.",
   "permissions": ["activeTab", "scripting", "storage", "tabs", "sidePanel"],
   "host_permissions": [
