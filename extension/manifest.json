@@ -11,7 +11,7 @@
   ],
   "optional_host_permissions": ["https://*/*", "http://*/*"],
   "oauth2": {
-    "client_id": "REPLACE_WITH_GOOGLE_OAUTH_CLIENT_ID.apps.googleusercontent.com",
+    "client_id": "1048478461855-dufe24r533b5lc17uud25827tmmvn6t9.apps.googleusercontent.com",
     "scopes": [
       "https://www.googleapis.com/auth/drive.metadata.readonly",
       "https://www.googleapis.com/auth/spreadsheets"
