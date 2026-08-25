@@ -1,0 +1,11 @@
+(()=>{
+const PF_SOLD={
+ sleep:ms=>new Promise(r=>setTimeout(r,ms)),
+ text:el=>(el?.innerText||el?.textContent||'').replace(/\s+/g,' ').trim(),
+ parseMoney(s){const m=String(s||'').replace(/,/g,'').match(/(?:US\s*)?\$\s*([0-9]+(?:\.[0-9]{1,2})?)/i);return m?Number(m[1]):null},
+ async wait(){for(let i=0;i<40;i++){if(document.querySelector('.s-item,[data-view*="mi:"]'))return;await this.sleep(250)}},
+ rows(){const out=[];for(const box of document.querySelectorAll('.s-item')){const title=this.text(box.querySelector('.s-item__title'));if(!title||/^Shop on eBay$/i.test(title))continue;const price=this.parseMoney(this.text(box.querySelector('.s-item__price')));if(!Number.isFinite(price))continue;const shippingText=this.text(box.querySelector('.s-item__shipping,.s-item__logisticsCost'));const shipping=/free/i.test(shippingText)?0:this.parseMoney(shippingText)||0;const soldText=this.text(box.querySelector('.s-item__quantitySold,.s-item__hotness,.s-item__ended-date'))+' '+this.text(box);const qm=soldText.match(/([0-9,]+)\s+sold/i);const quantitySold=qm?Number(qm[1].replace(/,/g,'')):1;const a=box.querySelector('a.s-item__link');out.push({title,price:{amount:price,currency:'USD'},shipping:{amount:shipping,currency:'USD'},quantitySold,url:a?.href||'',rawText:this.text(box).slice(0,2000)});if(out.length>=20)break}return out},
+ async researchOne(query){const u=new URL('https://www.ebay.com/sch/i.html');u.searchParams.set('_nkw',query);u.searchParams.set('LH_Sold','1');u.searchParams.set('LH_Complete','1');u.searchParams.set('_ipg','60');if(location.href!==u.toString()){location.href=u.toString();await new Promise(()=>{})}await this.wait();const rows=this.rows();const prices=rows.map(r=>r.price.amount).filter(Number.isFinite);const units=rows.reduce((n,r)=>n+(Number(r.quantitySold)||1),0);return {provider:'EBAY_SOLD_LISTINGS_BROWSER',evidenceSource:'eBay Sold Items',marketplace:'EBAY_US',query,url:location.href,capturedAt:new Date().toISOString(),resultState:{resultType:'SOLD'},summary:{averageSoldPrice:prices.length?{amount:prices.reduce((a,b)=>a+b,0)/prices.length,currency:'USD'}:null},rows,products:rows,recentDemand:{days30:{units:null,verified:false},days90:{units:null,verified:false},days365:{units,verified:false,sampleOnly:true},trend:'SOLD LISTINGS FALLBACK SAMPLE'}}
+};
+window.PF_EBAY_SOLD=PF_SOLD;
+})();
