@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Product Finder Companion",
-  "version": "0.9.0",
-  "description": "Amazon-to-eBay product scout with Product Research and automatic eBay Sold Items fallback.",
+  "version": "0.9.1",
+  "description": "Amazon-to-eBay product scout with Product Research, automatic Sold Items fallback, and worker diagnostics.",
   "permissions": ["activeTab", "scripting", "storage", "tabs", "sidePanel"],
   "host_permissions": [
     "https://*.ebay.com/*", "https://ebay.com/*", "https://*.ebay.ca/*", "https://ebay.ca/*",
