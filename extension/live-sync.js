@@ -13,12 +13,23 @@ function renderSource(p){
  if($('sourceAsin'))$('sourceAsin').textContent=p.asin?`ASIN: ${p.asin}`:'';if($('sourceVariation'))$('sourceVariation').textContent=p.variation||'';if($('ebayQuery'))$('ebayQuery').value=p.title||'';
 }
 function renderResearch(r){
- if(!r){if($('demand'))$('demand').textContent='No demand captured.';if($('competition'))$('competition').textContent='—';if($('winners'))$('winners').textContent='No captured listings yet.';return;}
+ if(!r){
+  if($('demand'))$('demand').textContent='No eBay research for this product yet.';
+  if($('competition'))$('competition').textContent='—';if($('winners'))$('winners').textContent='No captured listings yet.';
+  if($('verdict'))$('verdict').textContent='RESEARCH REQUIRED';if($('verdictReason'))$('verdictReason').textContent='New Amazon product captured — run eBay research';
+  if($('researchStatus'))$('researchStatus').textContent='NEW PRODUCT — EBAY RESEARCH REQUIRED';
+  if($('ebayCurrency'))$('ebayCurrency').textContent='eBay: —';
+  ['d30','d90','d365','avgSold','maxCost','profit','roi'].forEach(id=>{if($(id))$(id).textContent='—'});
+  if($('economics'))$('economics').textContent='Run eBay research before calculating.';
+  if($('buyPlan'))$('buyPlan').textContent='Pending eBay research.';
+  if($('sellPlan'))$('sellPlan').textContent='Research this product on eBay to build the launch plan.';
+  return;
+ }
  const rows=researchRows(r),u=units(r),d=demand(r),c=r?.summary?.averageSoldPrice?.currency||'',avg=r?.summary?.averageSoldPrice?.amount;
  if($('demand'))$('demand').innerHTML=`<div class="row"><span>Demand</span><strong>${d}</strong></div><div class="row"><span>Observed units</span><strong>${u}</strong></div><div class="row"><span>Average sold</span><strong>${money(avg,c)}</strong></div><div class="row"><span>Sample</span><strong>${rows.length} sold listings</strong></div>`;
  if($('competition'))$('competition').innerHTML=rows.length?`<div class="row"><span>Top sellers</span><strong>${rows.slice(0,3).map(x=>x.quantitySold).join(' / ')}</strong></div><div class="row"><span>Top-3 share</span><strong>${u?((rows.slice(0,3).reduce((s,x)=>s+Number(x.quantitySold||0),0)/u)*100).toFixed(1):'0.0'}%</strong></div>`:'—';
  if($('winners'))$('winners').innerHTML=rows.slice(0,3).map((x,i)=>`<div class="listing"><strong>#${i+1} • ${x.quantitySold} sold</strong><div>${cleanTitle(x.title)||x.listingId||''}</div></div>`).join('')||'No captured listings yet.';
- if($('verdict'))$('verdict').textContent=d==='STRONG'?'DEMAND ✓':'REVIEW';if($('verdictReason'))$('verdictReason').textContent='eBay research synchronized';
+ if($('verdict'))$('verdict').textContent=d==='STRONG'?'DEMAND ✓':'REVIEW';if($('verdictReason'))$('verdictReason').textContent='eBay research synchronized';if($('researchStatus'))$('researchStatus').textContent='eBay research captured for current product.';
 }
 async function sync(){const s=await chrome.storage.local.get({pfLastSource:null,pfLastResearch:null});renderSource(s.pfLastSource);renderResearch(s.pfLastResearch)}
 chrome.storage.onChanged.addListener((changes,area)=>{if(area!=='local')return;if(changes.pfLastSource||changes.pfLastResearch||changes.pfEconomics){sync();}});
