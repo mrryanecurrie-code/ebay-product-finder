@@ -2,6 +2,7 @@
 const $=id=>document.getElementById(id);
 const money=(amount,currency)=>{const n=Number(amount);if(!Number.isFinite(n))return'—';return `${currency==='CAD'?'C$':currency==='USD'?'US$':'$'}${n.toFixed(2)}`};
 const cleanTitle=s=>String(s||'').replace(/^,?\s*preview full size image\s*/i,'').trim();
+let lastAutoSourceKey='',autoTimer=null;
 function researchRows(r){return(r?.rows||r?.products||[]).filter(x=>Number(x.quantitySold)>0).sort((a,b)=>Number(b.quantitySold)-Number(a.quantitySold))}
 function units(r){return researchRows(r).reduce((s,x)=>s+Number(x.quantitySold||0),0)}
 function demand(r){const u=units(r),rows=researchRows(r);return u>=100||rows.filter(x=>Number(x.quantitySold)>=10).length>=3?'STRONG':u>=20?'MODERATE':u>0?'WEAK':'NO PROVEN DEMAND'}
@@ -16,13 +17,13 @@ function renderResearch(r){
  if(!r){
   if($('demand'))$('demand').textContent='No eBay research for this product yet.';
   if($('competition'))$('competition').textContent='—';if($('winners'))$('winners').textContent='No captured listings yet.';
-  if($('verdict'))$('verdict').textContent='RESEARCH REQUIRED';if($('verdictReason'))$('verdictReason').textContent='New Amazon product captured — run eBay research';
-  if($('researchStatus'))$('researchStatus').textContent='NEW PRODUCT — EBAY RESEARCH REQUIRED';
+  if($('verdict'))$('verdict').textContent='RESEARCHING';if($('verdictReason'))$('verdictReason').textContent='New Amazon product captured — eBay research starting automatically';
+  if($('researchStatus'))$('researchStatus').textContent='AUTO RESEARCH — STARTING…';
   if($('ebayCurrency'))$('ebayCurrency').textContent='eBay: —';
   ['d30','d90','d365','avgSold','maxCost','profit','roi'].forEach(id=>{if($(id))$(id).textContent='—'});
-  if($('economics'))$('economics').textContent='Run eBay research before calculating.';
+  if($('economics'))$('economics').textContent='Waiting for eBay research.';
   if($('buyPlan'))$('buyPlan').textContent='Pending eBay research.';
-  if($('sellPlan'))$('sellPlan').textContent='Research this product on eBay to build the launch plan.';
+  if($('sellPlan'))$('sellPlan').textContent='Automatic eBay research is running.';
   return;
  }
  const rows=researchRows(r),u=units(r),d=demand(r),c=r?.summary?.averageSoldPrice?.currency||'',avg=r?.summary?.averageSoldPrice?.amount;
@@ -31,7 +32,21 @@ function renderResearch(r){
  if($('winners'))$('winners').innerHTML=rows.slice(0,3).map((x,i)=>`<div class="listing"><strong>#${i+1} • ${x.quantitySold} sold</strong><div>${cleanTitle(x.title)||x.listingId||''}</div></div>`).join('')||'No captured listings yet.';
  if($('verdict'))$('verdict').textContent=d==='STRONG'?'DEMAND ✓':'REVIEW';if($('verdictReason'))$('verdictReason').textContent='eBay research synchronized';if($('researchStatus'))$('researchStatus').textContent='eBay research captured for current product.';
 }
+function sourceKey(p){return String(p?.asin||p?.url||p?.title||'').trim()}
+function scheduleAutoResearch(p){
+ const key=sourceKey(p);if(!key||!p?.title||key===lastAutoSourceKey)return;lastAutoSourceKey=key;
+ clearTimeout(autoTimer);autoTimer=setTimeout(()=>{
+  const q=$('ebayQuery'),btn=$('ebayOne');if(!q||!btn)return;
+  q.value=p.title;
+  if($('researchStatus'))$('researchStatus').textContent='AUTO RESEARCH — FIRING EBAY SEARCH…';
+  btn.click();
+ },700);
+}
 async function sync(){const s=await chrome.storage.local.get({pfLastSource:null,pfLastResearch:null});renderSource(s.pfLastSource);renderResearch(s.pfLastResearch)}
-chrome.storage.onChanged.addListener((changes,area)=>{if(area!=='local')return;if(changes.pfLastSource||changes.pfLastResearch||changes.pfEconomics){sync();}});
+chrome.storage.onChanged.addListener((changes,area)=>{
+ if(area!=='local')return;
+ if(changes.pfLastSource){const p=changes.pfLastSource.newValue;sync();if(p)scheduleAutoResearch(p);return;}
+ if(changes.pfLastResearch||changes.pfEconomics)sync();
+});
 document.readyState==='loading'?document.addEventListener('DOMContentLoaded',sync):sync();
 })();
