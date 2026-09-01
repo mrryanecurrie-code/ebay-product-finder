@@ -20,29 +20,32 @@
     const bsr=detailText.find(x=>/best sellers rank/i.test(x))||'';
     return {asin,title,price,image,brand,rating,reviews,bought,variation,bullets,bsr,url:location.href,capturedAt:new Date().toISOString()};
   };
-  let lastSignature='';let timer=null;let lastUrl=location.href;
+  let lastSignature='',timer=null,lastUrl=location.href,lastResearchKey='';
   const signature=p=>[p.asin,p.title,p.price,p.image,p.variation,p.bought,p.bsr].join('|');
-  async function ensureAutoResearch(){
-    try{const x=await chrome.storage.local.get('scout');const scout=x.scout||{};if(!scout.enabled){scout.enabled=true;scout.status='WAITING FOR AMAZON';scout.lastError='';await chrome.storage.local.set({scout});}}catch(e){}
+  async function fireResearch(p){
+    const key=p?.asin||p?.title||'';if(!key||key===lastResearchKey)return;
+    try{
+      const response=await chrome.runtime.sendMessage({type:'PF_AMAZON_PRODUCT',product:p});
+      if(response?.ok){lastResearchKey=key;await chrome.storage.local.set({pfEbayResearchStatus:'EBAY RESEARCH REQUESTED'});}
+      else await chrome.storage.local.set({pfEbayResearchStatus:`EBAY RESEARCH ERROR: ${response?.error||'service worker did not accept request'}`});
+    }catch(e){await chrome.storage.local.set({pfEbayResearchStatus:`EBAY RESEARCH ERROR: ${String(e?.message||e)}`}).catch(()=>{});}
   }
   const autoCapture=async(force=false)=>{
-    if(!isProductPage()) return;
+    if(!isProductPage())return;
     const p=product();if(!p.asin||!p.title||p.title.length<4)return;
     const sig=signature(p);if(!force&&sig===lastSignature)return;
+    const asinChanged=!lastSignature||!lastSignature.startsWith(`${p.asin}|`);
     lastSignature=sig;
-    try{await chrome.storage.local.set({pfLastSource:p,pfLastResearch:null,pfEconomics:null});}catch(e){}
-    await ensureAutoResearch();
-    chrome.runtime.sendMessage({type:'PF_AMAZON_PRODUCT',product:p}).catch(()=>{});
+    try{await chrome.storage.local.set({pfLastSource:p,pfLastResearch:null,pfEconomics:null,pfEbayResearchStatus:'AMAZON CAPTURED — STARTING EBAY'});}catch(e){}
+    if(asinChanged)lastResearchKey='';
+    await fireResearch(p);
   };
   const schedule=(force=false,delay=650)=>{clearTimeout(timer);timer=setTimeout(()=>autoCapture(force),delay);};
-  chrome.runtime.onMessage.addListener((m,_s,reply)=>{if(m?.type==='PF_CAPTURE_AMAZON_NOW'){const p=product();if(p?.asin&&p?.title)chrome.storage.local.set({pfLastSource:p,pfLastResearch:null,pfEconomics:null});lastSignature=signature(p);ensureAutoResearch().then(()=>chrome.runtime.sendMessage({type:'PF_AMAZON_PRODUCT',product:p}).catch(()=>{}));reply({ok:true,product:p});return true;}});
+  chrome.runtime.onMessage.addListener((m,_s,reply)=>{if(m?.type==='PF_CAPTURE_AMAZON_NOW'){const p=product();if(p?.asin&&p?.title)chrome.storage.local.set({pfLastSource:p,pfLastResearch:null,pfEconomics:null,pfEbayResearchStatus:'AMAZON CAPTURED — STARTING EBAY'});lastSignature=signature(p);lastResearchKey='';fireResearch(p);reply({ok:true,product:p});return true;}});
   const changed=()=>{schedule(false,800);schedule(false,1800);};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>schedule(true,900));else schedule(true,900);
   window.addEventListener('load',()=>schedule(true,900));
   new MutationObserver(changed).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['src','value','class']});
-  ['popstate','hashchange'].forEach(ev=>window.addEventListener(ev,()=>{lastSignature='';schedule(true,900)}));
-  setInterval(()=>{
-    if(location.href!==lastUrl){lastUrl=location.href;lastSignature='';schedule(true,900);schedule(false,2000);return;}
-    if(isProductPage())autoCapture(false);
-  },1200);
+  ['popstate','hashchange'].forEach(ev=>window.addEventListener(ev,()=>{lastSignature='';lastResearchKey='';schedule(true,900)}));
+  setInterval(()=>{if(location.href!==lastUrl){lastUrl=location.href;lastSignature='';lastResearchKey='';schedule(true,900);schedule(false,2000);return;}if(isProductPage())autoCapture(false);},1200);
 })();
